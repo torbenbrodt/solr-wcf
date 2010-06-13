@@ -1,0 +1,5 @@
+ * wenn man alle objekte zur laufzeit hinzufügen will, muss man eine menge plugins schreiben
+ * alternative cronjob der die informationen zu solr pumpt, dazu ähnliches query wie in SearchEngine::search verwenden
+ * spaltennamen aus SearchableMessageType verwenden
+ * aktuellen stand der indexierung merken und nur neue items pushen
+ * TODO: exclude types! pms dürfen nicht in die public suche

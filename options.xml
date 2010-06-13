@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<!DOCTYPE data SYSTEM "http://www.woltlab.com/DTDs/options.dtd">
+<data>
+	<import>
+		<options>
+			<option name="solr_url">
+				<optiontype>text</optiontype>
+				<defaultvalue>http://</defaultvalue>
+			</option>
+		</options>
+	</import>
+</data>
