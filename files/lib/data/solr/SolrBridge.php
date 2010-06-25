@@ -120,8 +120,6 @@ class SolrBridge {
 					".(!empty($conditions[$type]) ? " ".(!empty($q) ? "AND" : "")." (".$conditions[$type].")" : "")."
 			GROUP BY	messageID";
 
-		$messages = array();
-
 		$result = WCF::getDB()->sendQuery($sql, $limit);
 		while ($row = WCF::getDB()->fetchArray($result)) {
 			$this->addDocument($row);

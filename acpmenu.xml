@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE import SYSTEM "DTD/import.dtd">
+<data>
+	<import>
+		<acpmenuitem name="wcf.acp.menu.link.solr">
+			<parent>wcf.acp.menu.link.content</parent>
+			<showorder>1</showorder>
+		</acpmenuitem>
+		<acpmenuitem name="wcf.acp.menu.link.solr.index">
+			<parent>wcf.acp.menu.link.solr</parent>
+			<showorder>1</showorder>
+			<link>index.php?form=Solr</link>
+			<icon>icon/solrM.png</icon>
+		</acpmenuitem>
+	</import>
+</data>

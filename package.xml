@@ -20,13 +20,21 @@
 		<requiredpackage minversion="1.0.0">com.woltlab.wcf</requiredpackage>
 	</requiredpackages>
 
-	<instructions type="install">		
+	<instructions type="install">
+		<!-- files -->
 		<files>files.tar</files>
 		<templates>templates.tar</templates>
+		<acptemplates>acptemplates.tar</acptemplates>
 		
-		<searchablemessagetypes>smt.xml</searchablemessagetypes>
-		<options>options.xml</options>
+		<!-- config -->
 		<eventlistener>eventlistener.xml</eventlistener>
+		<acpmenu>acpmenu.xml</acpmenu>
+		<options>options.xml</options>
+		<groupoptions>groupoptions.xml</groupoptions>
+		<pagemenu>pagemenu.xml</pagemenu>
+		<pagelocation>pagelocation.xml</pagelocation>
+		
+		<!-- languages -->
 		<languages languagecode="de">de.xml</languages>
 		<languages languagecode="en">en.xml</languages>
 	</instructions>

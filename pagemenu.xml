@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE data SYSTEM "http://www.woltlab.com/DTDs/headerMenu.dtd">
+<data>	
+	<import>
+		<pagemenuitem name="wcf.header.menu.user.solr">
+			<iconmedium>solrM.png</iconmedium>
+			<iconsmall>solrS.png</iconsmall>
+			<link>index.php?form=SolrSearch</link>
+			<permissions>user.solr.canViewSolr</permissions>
+			<options>module_solr</options>
+		</pagemenuitem>
+	</import>
+</data>
