@@ -1,4 +1,8 @@
 <?php
+// wcf imports
+require_once(WCF_DIR.'lib/data/message/search/SearchEngine.class.php');
+require_once(WCF_DIR.'lib/data/solr/SolrService.php');
+
 
 /**
  *
@@ -23,10 +27,9 @@ class SolrBridge {
 	public function __construct() {
 	
 		// load search type objects
-		SearchEngne::getSearchTypes();
+		SearchEngine::getSearchTypes();
 		
-		$path = parse_url(SOLR_URL);
-		$this->solr = new SolrService($path['host'], isset($path['port']) ? $path['port'] : 80, $path['path']);
+		$this->solr = new SolrService();
 	}
 	
 	/**
@@ -39,7 +42,7 @@ class SolrBridge {
 		// mark items as done
 		$sql = "INSERT IGNORE INTO
 					wcf".WCF_N."_solr_index
-					(typeName, messageID)";
+					(typeID, messageID)";
 		foreach($this->documents as $doc) {
 			$sql .= ""; //TODO: mark as done
 		}
@@ -54,7 +57,7 @@ class SolrBridge {
 	/**
 	 *
 	 */
-	protected function getTotals(array $types) {
+	protected function getTotals(array $types, $func) {
 
 		$sql = '';
 		foreach ($types as $type) {
@@ -69,19 +72,16 @@ class SolrBridge {
 			$messageIDFieldName = strpos($messageIDFieldName, '.') !== false ? $messageIDFieldName : "messageTable.".$messageIDFieldName;
 			
 			$sql .= "(	
-				SELECT		MAX(".$messageIDFieldName.") AS messageID,
+				SELECT		".$func."(".$messageIDFieldName.") AS messageID,
 						'".$type."' AS messageType
 				FROM 		".$doc->getTableName()." messageTable
 						".$doc->getJoins()."
-				WHERE		1
-						".(!empty($conditions[$type]) ? " ".(!empty($q) ? "AND" : "")." (".$conditions[$type].")" : "")."
-				GROUP BY	messageID
 			)";
 		}
 		
 		// send search query
 		$types = array();
-		$result = WCF::getDB()->sendQuery($sql, $limit);
+		$result = WCF::getDB()->sendQuery($sql);
 		while ($row = WCF::getDB()->fetchArray($result)) {
 			$types[$row['messageType']] = $row['messageID'];
 		}
@@ -161,7 +161,7 @@ class SolrBridge {
 			}
 			
 			$this->loadDocuments($row['current'] + 1, min($row['total'], $row['current'] + 1 + $limit));
-		
+
 			// write to solr
 			$this->commit();
 		}
@@ -183,22 +183,32 @@ class SolrBridge {
 			$status[$type] = array(
 				'current' => 0,
 				'total' => 0,
+				'percent' => 0,
 			);
 		}
 		
 		// read current status
-		
-		while ($row = WCF::getDB()->fetchArray($result)) {
+		$sql = 'SELECT		typeName,
+					c
+			FROM (
+				SELECT 		typeID, 
+						COUNT(typeID) AS c
+				FROM		wcf'.WCF_N.'_solr_index 
+				GROUP BY 	typeID
+			) x
+			INNER JOIN 	wcf'.WCF_N.'_searchable_message_type USING(typeID)';
+		while ($row = WCF::getDB()->fetchArray($sql)) {
 			$typeName = $row['typeName'];
-			$status[$typeName]['current'] = $row['messageID'];
+			$status[$typeName]['current'] = $row['c'];
 		}
 
 		// read totals
-		foreach ($this->getTotals($type) as $typeName => $total) {
-			$status[$typeName]['total'] = $row['messageID'];
+		foreach ($this->getTotals($types, 'COUNT') as $typeName => $count) {
+			$percent = $count ? 100 / $count * $status[$typeName]['current'] : 0;
+			$status[$typeName]['total'] = $count;
 		}
 		
-		return $messages;
+		return $status;
 	}
 }
 ?>

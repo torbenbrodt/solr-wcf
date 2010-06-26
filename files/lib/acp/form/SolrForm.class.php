@@ -24,7 +24,7 @@ class SolrForm extends ACPForm {
 	 *
 	 * @var	string
 	 */
-	public $activeMenuItem = 'wcf.acp.menu.link.contest.class';
+	public $activeMenuItem = 'wcf.acp.menu.link.solr.index';
 	
 	/**
 	 * Permission
@@ -47,10 +47,13 @@ class SolrForm extends ACPForm {
 	}
 
 	/**
-	 * @see Form::validate()
+	 * @see Page::readData()
 	 */
-	public function validate() {
-		parent::validate();
+	public function readData() {
+		parent::readData();
+
+		$this->bridge = new SolrBridge();
+		$this->status = $this->bridge->getIndexStatus();
 	}
 
 	/**
@@ -79,12 +82,7 @@ class SolrForm extends ACPForm {
 		parent::assignVariables();
 
 		WCF::getTPL()->assign(array(
-			'topic' => $this->topic,
-			'text' => $this->text,
-			'contestClass' => $this->contestClass,
-			'languageID' => $this->languageID,
-			'class' => $this->contestClass,
-			'action' => 'add'
+			'results' => $this->status,
 		));
 	}
 }

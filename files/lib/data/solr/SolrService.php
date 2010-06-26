@@ -1,13 +1,12 @@
 <?php
-require_once(BASEDIR.'libs/solr/Service.php');
+require_once(WCF_DIR.'lib/data/solr/Service.php');
 
 /**
  * need to overwrite search servlet
  */
 class SolrService extends Apache_Solr_Service {
-	public function __construct($url) {
-		$path = parse_url($url);
-		
+	public function __construct() {
+		$path = parse_url(SOLR_URL);
 		parent::__construct($path['host'], isset($path['port']) ? $path['port'] : 80, $path['path']);
 	}
 

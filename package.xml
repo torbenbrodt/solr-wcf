@@ -25,12 +25,12 @@
 		<files>files.tar</files>
 		<templates>templates.tar</templates>
 		<acptemplates>acptemplates.tar</acptemplates>
+		<sql>install.sql</sql>
 		
 		<!-- config -->
 		<eventlistener>eventlistener.xml</eventlistener>
 		<acpmenu>acpmenu.xml</acpmenu>
 		<options>options.xml</options>
-		<groupoptions>groupoptions.xml</groupoptions>
 		<pagemenu>pagemenu.xml</pagemenu>
 		<pagelocation>pagelocation.xml</pagelocation>
 		
