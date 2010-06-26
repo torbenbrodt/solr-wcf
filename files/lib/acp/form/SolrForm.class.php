@@ -25,13 +25,6 @@ class SolrForm extends ACPForm {
 	 * @var	string
 	 */
 	public $activeMenuItem = 'wcf.acp.menu.link.solr.index';
-	
-	/**
-	 * Permission
-	 *
-	 * @var	string
-	 */
-	public $neededPermissions = 'admin.contest.canAddClass';
 
 
 	public function readParameters() {
@@ -43,7 +36,7 @@ class SolrForm extends ACPForm {
 	public function readFormParameters() {
 		parent::readFormParameters();
 
-		if (isset($_POST['topic'])) $this->topic = StringUtil::trim($_POST['topic']);
+		if (isset($_POST['type'])) $this->type = StringUtil::trim($_POST['type']);
 	}
 
 	/**
@@ -54,25 +47,9 @@ class SolrForm extends ACPForm {
 
 		$this->bridge = new SolrBridge();
 		$this->status = $this->bridge->getIndexStatus();
-	}
-
-	/**
-	 * @see Form::save()
-	 */
-	public function save() {
-		parent::save();
-
-		// save
-		$this->contestClass = ContestClassEditor::create($this->topic, $this->text, 
-			$this->parentClassID, $this->position, WCF::getLanguage()->getLanguageID());
-		$this->saved();
-
-		// reset values
-		$this->topic = $this->text = $this->parentClassID = '';
-		$this->languageID = $this->position = 0;
-
-		// show success message
-		WCF::getTPL()->assign('success', true);
+		
+		# demo call for crawling
+		# $this->bridge->doCrawl(array('lexicon'), 50);
 	}
 
 	/**

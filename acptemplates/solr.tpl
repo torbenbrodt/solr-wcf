@@ -19,16 +19,16 @@
 
 .statBarLabel {
 	margin-left: 410px;
-}			
+}
 /*]]>*/
 </style>
 {/capture}
 {include file='header'}
-	
+
 <div class="mainHeadline">
-	<img src="{@RELATIVE_WCF_DIR}icon/statsL.png" alt="" />
+	<img src="{@RELATIVE_WCF_DIR}icon/solrL.png" alt="" />
 	<div class="headlineContainer">
-		<h2>{lang}wcf.acp.stats{/lang}</h2>
+		<h2>{lang}wcf.acp.solr{/lang}</h2>
 	</div>
 </div>
 
@@ -37,15 +37,15 @@
 {/if}
 
 {if $results|isset && !$results|count}
-	<p class="error">{lang}wcf.acp.stats.noResults{/lang}</p>
+	<p class="error">{lang}wcf.acp.solr.noResults{/lang}</p>
 {/if}
 {*
-<form  method="post" action="index.php?form=Stats">
+<form  method="post" action="index.php?form=Solr">
 	<div class="border content">
 		<div class="container-1">
 			<fieldset>
-				<legend>{lang}wcf.acp.stats.config{/lang}</legend>
-				
+				<legend>{lang}wcf.acp.solr.config{/lang}</legend>
+
 				<div class="formElement{if $errorField == 'username'} formError{/if}">
 					<div class="formFieldLabel">
 						<label for="username">{lang}wcf.user.username{/lang}</label>
@@ -59,12 +59,12 @@
 						{/if}
 					</div>
 				</div>
-				
+
 				{if $additionalFields|isset}{@$additionalFields}{/if}
 			</fieldset>
 		</div>
 	</div>
-		
+
 	<div class="formSubmit">
 		<input type="submit" accesskey="s" value="{lang}wcf.global.button.submit{/lang}" />
 		<input type="reset" accesskey="r" value="{lang}wcf.global.button.reset{/lang}" />
@@ -77,14 +77,19 @@
 	<div class="border content">
 		<div class="container-1">
 			<fieldset>
-				<legend>{lang}wcf.acp.stats.results{/lang}</legend>
-	
+				<legend>{lang}wcf.acp.solr.results{/lang}</legend>
+
 				{foreach from=$results item=result key=$type}
 					<div class="formElement">
 						<p class="formFieldLabel">{$type}</p>
-						<div class="formField"><div class="statBar"><div style="width: {$result.percent|round}%;"></div></div><p class="statBarLabel">{#$result.current}/{#$result.total}</p></div>
+						<div class="formField">
+							<div class="statBar"><div style="width: {$result.percent|round}%;"></div></div>
+							<p class="statBarLabel">
+								{$result.percent|round}% {#$result.current}/{#$result.total}
+							</p>
+						</div>
 					</div>
-				
+
 				{/foreach}
 			</fieldset>
 		</div>
