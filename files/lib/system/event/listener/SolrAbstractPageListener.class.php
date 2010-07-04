@@ -7,7 +7,7 @@ require_once(WCF_DIR.'lib/system/event/EventListener.class.php');
  *
  * @author	Torben Brodt
  * @license	GNU General Public License <http://opensource.org/licenses/gpl-3.0.html>
- * @package	de.easy-coding.wcf.customsearch
+ * @package	de.easy-coding.wcf.solr
  */
 class SolrAbstractPageListener implements EventListener {
 	protected $eventObj;

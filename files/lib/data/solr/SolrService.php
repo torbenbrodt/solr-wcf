@@ -3,6 +3,9 @@ require_once(WCF_DIR.'lib/data/solr/Service.php');
 
 /**
  * need to overwrite search servlet
+ *
+ * @license	GNU General Public License <http://opensource.org/licenses/gpl-3.0.html>
+ * @package	de.easy-coding.wcf.solr
  */
 class SolrService extends Apache_Solr_Service {
 	public function __construct() {

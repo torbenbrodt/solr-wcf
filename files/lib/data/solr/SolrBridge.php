@@ -5,7 +5,10 @@ require_once(WCF_DIR.'lib/data/solr/SolrService.php');
 
 
 /**
+ * solr class abstraction
  *
+ * @license	GNU General Public License <http://opensource.org/licenses/gpl-3.0.html>
+ * @package	de.easy-coding.wcf.solr
  */
 class SolrBridge {
 

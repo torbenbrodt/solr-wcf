@@ -5,7 +5,7 @@
 		<pagemenuitem name="wcf.header.menu.user.solr">
 			<iconmedium>solrM.png</iconmedium>
 			<iconsmall>solrS.png</iconsmall>
-			<link>index.php?form=SolrSearch</link>
+			<link>index.php?page=SolrSearch</link>
 			<permissions>user.solr.canViewSolr</permissions>
 			<options>module_solr</options>
 		</pagemenuitem>

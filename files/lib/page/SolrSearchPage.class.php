@@ -5,7 +5,9 @@ require_once(WCF_DIR.'lib/data/solr/SolrService.php');
 
 /**
  * SearchForm handles given search request and shows the extended search form.
- * 
+ *
+ * @license	GNU General Public License <http://opensource.org/licenses/gpl-3.0.html>
+ * @package	de.easy-coding.wcf.solr
  */
 class SolrSearchPage extends SearchResultPage {
 	public $templateName = 'solr';
@@ -67,7 +69,7 @@ class SolrSearchPage extends SearchResultPage {
 		$i = $offset;
 
 		// query search
-		$solr = new SolrService(SOLR_URL);
+		$solr = new SolrService();
 		$tmp = $solr->search($this->query, $offset, $this->itemsPerPage);
 		$this->total = intval($tmp->response->numFound);
 		
