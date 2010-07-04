@@ -1,7 +1,7 @@
 <?php
 // wcf imports
 require_once(WCF_DIR.'lib/data/message/search/AbstractSearchableMessageType.class.php');
-require_once(WCF_DIR.'lib/data/contest/ContestSearchResult.class.php');
+require_once(WCF_DIR.'lib/data/solr/SolrSearchResult.class.php');
 
 /**
  * An implementation of SearchableMessageType for searching in user contests.
@@ -23,7 +23,15 @@ class SolrSearch extends AbstractSearchableMessageType {
 	 * just a pseudo definition
 	 */
 	public function cacheMessageData($messageIDs, $additionalData = null) {
-		$this->messageCache = $additionalData;
+		if(is_array($additionalData)) {
+			foreach($additionalData as $row) {
+				$entry = new SolrSearchResult($row);
+				if($entry->isViewable()) {
+					$this->messageCache[$row['messageID']] = $row;
+					$this->messageCache[$row['messageID']]['message'] = $entry;
+				}
+			}
+		}
 	}
 	
 	/**

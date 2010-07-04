@@ -3,6 +3,19 @@
 <language languagecode="de">
 	<category name="wcf.acp.option">
 		<item name="wcf.acp.option.solr_url"><![CDATA[Solr]]></item>
-		<item name="wcf.acp.option.solr_url.description"><![CDATA[e.g. http://solr.your-server.com:80/solr/nutch/]]></item>
+		<item name="wcf.acp.option.solr_url.description"><![CDATA[e.g. http://www.your-server.com:80/solr/]]></item>
+	</category>
+	<category name="wcf.header.menu">
+		<item name="wcf.header.menu.user.solr"><![CDATA[Search]]></item>
+	</category>
+	
+	<!-- admin: menu -->
+	<category name="wcf.acp.menu">
+		<item name="wcf.acp.menu.link.solr"><![CDATA[Searchserver]]></item>
+		<item name="wcf.acp.menu.link.solr.index"><![CDATA[Index]]></item>
+	</category>
+
+	<category name="wcf.acp.solr">
+		<item name="wcf.acp.solr"><![CDATA[Solr]]></item>
 	</category>
 </language>

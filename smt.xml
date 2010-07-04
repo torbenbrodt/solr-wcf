@@ -2,7 +2,7 @@
 <!DOCTYPE data SYSTEM "http://www.woltlab.com/DTDs/smt.dtd">
 <data>	
 	<import>
-		<smt name="contestEntry">
+		<smt name="solr">
 			<classpath>lib/data/solr/SolrSearch.class.php</classpath>
 		</smt>
 	</import>

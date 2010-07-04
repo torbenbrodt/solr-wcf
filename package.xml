@@ -33,6 +33,7 @@
 		<options>options.xml</options>
 		<pagemenu>pagemenu.xml</pagemenu>
 		<pagelocation>pagelocation.xml</pagelocation>
+		<searchablemessagetypes>smt.xml</searchablemessagetypes>
 		
 		<!-- languages -->
 		<languages languagecode="de">de.xml</languages>
