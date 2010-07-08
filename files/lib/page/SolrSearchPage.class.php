@@ -57,6 +57,12 @@ class SolrSearchPage extends SearchResultPage {
 			exit;
 		}
 		
+		if (isset($_POST['q'])) {
+			$url = ($this->isHTTPS() ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].'/index.php?page=SolrSearch&q='.$_POST['q'];
+			HeaderUtil::redirect($url, false, true);
+			exit;
+		}
+		
 		// get search query
 		if (isset($_REQUEST['q'])) $this->query = $_REQUEST['q'];
 	

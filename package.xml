@@ -5,7 +5,7 @@
 		<packagename>Solr Search</packagename>
 		<packagedescription>Solr powered search client. Solr backend needed!</packagedescription>
 		<packagedescription language="de">Das Paket integriert ein Solr Search Interface. Es wird ein zusätzlicher Solr Server benötigt.</packagedescription>
-		<version>1.0.0 RC 1</version>
+		<version>1.0.0 RC 2</version>
 		<plugin>com.woltlab.wcf</plugin>
 		<isunique>1</isunique>
 		<date>DATE</date>
@@ -19,6 +19,10 @@
 	<requiredpackages>
 		<requiredpackage minversion="1.0.0">com.woltlab.wcf</requiredpackage>
 	</requiredpackages>
+	
+	<optionalpackages>
+		<optionalpackage file="optionals/de.easy-coding.wbb.taggingreloaded.tar.gz">de.easy-coding.wbb.taggingreloaded</optionalpackage>
+	</optionalpackages>
 
 	<instructions type="install">
 		<!-- files -->
@@ -42,5 +46,6 @@
 	
 	<instructions type="update" fromversion="1.0.0 RC 1">	
 		<files>files.tar</files>
+		<templates>templates.tar</templates>
 	</instructions>
 </package>

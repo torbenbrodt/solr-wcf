@@ -1,6 +1,6 @@
 {include file="documentHeader"}
 <head>
-	<title>{lang}wcf.search.results{/lang} - {lang}{PAGE_TITLE}{/lang}</title>
+	<title>{$query}, {lang}wcf.search.results{/lang} {lang}wcf.global.pageNo{/lang} - {lang}{PAGE_TITLE}{/lang}</title>
 	
 	{include file='headInclude' sandbox=false}
 	<script type="text/javascript" src="{@RELATIVE_WCF_DIR}js/MultiPagesLinks.class.js"></script>
@@ -18,6 +18,10 @@
 	</style>
 </head>
 <body{if $templateName|isset} id="tpl{$templateName|ucfirst}"{/if}>
+{* --- quick search controls --- *}
+{assign var='searchScript' value='index.php?page=SolrSearch'}
+{assign var='searchFieldName' value='q'}
+{* --- end --- *}
 {include file='header' sandbox=false}
 
 <div id="main">
@@ -110,7 +114,6 @@
 						
 						<div class="floatContainer">
 							<input type="hidden" name="form" value="Search" />
-							<input type="hidden" name="searchID" value="{@$searchID}" />
 							<input type="hidden" name="pageNo" value="{@$pageNo}" />
 							<input type="hidden" name="highlight" value="{@$highlight}" />
 							
