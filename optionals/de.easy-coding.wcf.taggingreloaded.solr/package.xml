@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE package SYSTEM "http://www.woltlab.com/DTDs/package.dtd">
+<package name="de.easy-coding.wcf.taggingreloaded.solr">
+	<packageinformation>
+		<packagename>solr: tagging</packagename>
+		<version>1.0.0</version>
+		<date>DATE</date>
+		<plugin>com.woltlab.wcf</plugin>
+		<isunique>1</isunique>
+	</packageinformation>
+	
+	<authorinformation>
+		<author>Torben Brodt</author>
+		<authorurl>http://www.easy-coding.de/trac/wcf</authorurl>
+	</authorinformation>
+
+	<requiredpackages>
+		<requiredpackage minversion="1.1.0 Beta 1">com.woltlab.wcf</requiredpackage>
+		<requiredpackage minversion="0.0.1 Beta 1">de.easy-coding.wcf.taggingreloaded</requiredpackage>
+		<requiredpackage minversion="0.0.1 Beta 1">de.easy-coding.wcf.solr</requiredpackage>
+	</requiredpackages>
+
+	<instructions type="install">
+		<files>files.tar</files>
+		<eventlistener>eventlistener.xml</eventlistener>
+	</instructions>
+
+	<instructions type="update" fromversion="0.8.1">
+		<files>files.tar</files>
+        </instructions>
+</package>
