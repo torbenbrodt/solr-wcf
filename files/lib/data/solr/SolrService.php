@@ -18,7 +18,7 @@ class SolrService extends Apache_Solr_Service {
 	 */
 	protected function _initUrls() {
 		parent::_initUrls();
-		$this->_searchUrl = $this->_constructUrl('');
+		$this->_searchUrl = $this->_constructUrl(SOLR_SERVLET_SEARCH);
 	}
 }
 ?>

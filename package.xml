@@ -21,7 +21,7 @@
 	</requiredpackages>
 	
 	<optionalpackages>
-		<optionalpackage file="optionals/de.easy-coding.wbb.taggingreloaded.tar.gz">de.easy-coding.wbb.taggingreloaded</optionalpackage>
+		<optionalpackage file="optionals/de.easy-coding.wcf.taggingreloaded.solr.tar.gz">de.easy-coding.wcf.taggingreloaded.solr</optionalpackage>
 	</optionalpackages>
 
 	<instructions type="install">
@@ -32,6 +32,7 @@
 		<sql>install.sql</sql>
 		
 		<!-- config -->
+		<cronjobs>cronjobs.xml</cronjobs>
 		<eventlistener>eventlistener.xml</eventlistener>
 		<acpmenu>acpmenu.xml</acpmenu>
 		<options>options.xml</options>
@@ -47,5 +48,11 @@
 	<instructions type="update" fromversion="1.0.0 RC 1">	
 		<files>files.tar</files>
 		<templates>templates.tar</templates>
+		<cronjobs>cronjobs.xml</cronjobs>
+		<options>options.xml</options>
+		
+		<!-- languages -->
+		<languages languagecode="de">de.xml</languages>
+		<languages languagecode="en">en.xml</languages>
 	</instructions>
 </package>

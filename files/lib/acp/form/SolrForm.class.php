@@ -47,9 +47,6 @@ class SolrForm extends ACPForm {
 
 		$this->bridge = new SolrBridge();
 		$this->status = $this->bridge->getIndexStatus();
-		
-		# demo call for crawling
-		# $this->bridge->doCrawl(array('lexicon'), 50);
 	}
 
 	/**

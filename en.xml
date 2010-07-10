@@ -4,6 +4,10 @@
 	<category name="wcf.acp.option">
 		<item name="wcf.acp.option.solr_url"><![CDATA[Solr]]></item>
 		<item name="wcf.acp.option.solr_url.description"><![CDATA[e.g. http://www.your-server.com:80/solr/]]></item>
+		<item name="wcf.acp.option.solr_servlet_search"><![CDATA[Solr Search Servlet]]></item>
+		<item name="wcf.acp.option.solr_servlet_search.description"><![CDATA[e.g. nutch]]></item>
+		<item name="wcf.acp.option.module_solr"><![CDATA[Solr]]></item>
+		<item name="wcf.acp.option.module_solr.description"><![CDATA[Solr Searchserver.]]></item>
 	</category>
 	<category name="wcf.header.menu">
 		<item name="wcf.header.menu.user.solr"><![CDATA[Search]]></item>

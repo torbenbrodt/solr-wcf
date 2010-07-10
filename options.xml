@@ -20,6 +20,11 @@
 				<optiontype>text</optiontype>
 				<defaultvalue>http://</defaultvalue>
 			</option>
+			<option name="solr_servlet_search">
+				<categoryname>general.search</categoryname>
+				<optiontype>text</optiontype>
+				<defaultvalue>nutch</defaultvalue>
+			</option>
 		</options>
 	</import>
 </data>

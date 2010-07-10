@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE data SYSTEM "http://www.woltlab.com/DTDs/cronjobs.dtd">
+<data>
+	<import>
+		<cronjob>
+			<classPath>lib/system/cronjob/SolrIndexCronjob.class.php</classPath>
+			<description><![CDATA[Sole Indexer]]></description>
+			<startminute>*/30</startminute>
+			<starthour>*</starthour>
+			<startdom>*</startdom>
+			<startmonth>*</startmonth>
+			<startdow>*</startdow>
+			<execmultiple>0</execmultiple>
+			<canbeedited>1</canbeedited>
+			<canbedisabled>1</canbedisabled>
+		</cronjob>
+	</import>
+</data>
