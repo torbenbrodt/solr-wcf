@@ -24,6 +24,7 @@ class TaggingReloadedSolrPageListener implements EventListener {
 
 	// data
 	protected $tags = array();
+	protected $queries = array();
 
 	/**
 	 * @see EventListener::execute()
@@ -63,6 +64,26 @@ class TaggingReloadedSolrPageListener implements EventListener {
 		return $sql;
 	}
 	
+	/**
+	 * gets tags similar to the current tag
+	 */
+	protected function getSimilarQueries($tagIDs, $limit = 5) {
+		$sql = "SELECT		query
+			FROM		wcf".WCF_N."_tagging3_query
+			WHERE		tagID IN (".implode(",", ArrayUtil::toIntegerArray($tagIDs)).")
+			AND		query != '".escapeString($this->eventObj->query)."'
+			GROUP BY	query
+			ORDER BY	SUM(weight) DESC
+			LIMIT		".intval($limit);
+
+		$result = WCF::getDB()->sendQuery($sql);
+		$queries = array();
+		while ($row = WCF::getDB()->fetchArray($result)) {
+			$queries[] = $row['query'];
+		}
+		return $queries;
+	}
+	
 	protected function fromQuery($sql) {
 		$result = WCF::getDB()->sendQuery($sql);
 		$tags = array();
@@ -99,6 +120,7 @@ class TaggingReloadedSolrPageListener implements EventListener {
 
 		if(count($tagIDs)) {
 			$this->tags = $this->fromQuery($this->querySimilarTagsquerySimilarTags($tagIDs));
+			$this->queries = $this->getSimilarQueries($tagIDs);
 		}
 	}
 
@@ -106,15 +128,27 @@ class TaggingReloadedSolrPageListener implements EventListener {
          * @see Page::assignVariables()
          */
 	protected function assignVariables () {
+		$content = '';
+
 		if(count($this->tags)) {
 			WCF::getTPL()->append('specialStyles', '<link rel="stylesheet" type="text/css" href="'.RELATIVE_WCF_DIR.'style/taggingreloaded.css" />');
 			WCF::getTPL()->assign('tags', $this->tags);
-			
+
+			$content .= '<h3 class="subHeadline">'.WCF::getLanguage()->get('wcf.taggingreloaded.similar').'</h3>
+					'.WCF::getTPL()->fetch('tagCloud');
+		}
+		
+		if(count($this->queries)) {
+			$content .= '<h3 class="subHeadline">'.WCF::getLanguage()->get('Ähnliche Suchanfragen').'</h3><ul>';
+			foreach($this->queries as $query) {
+				$content .= '<li><a href="index.php?page=SolrSearch&q='.urlencode($query).'">'.StringUtil::encodeHTML($query).'</a></li>';
+			}
+			$content .= '<ul>';
+		}
+
+		if($content) {
 			WCF::getTPL()->append('additionalContentFooterElements', '<br style="clear:both"/><br/><div class="border content">
-				<div class="container-1">
-					<h3 class="subHeadline">'.WCF::getLanguage()->get('wcf.taggingreloaded.similar').'</h3>
-					'.WCF::getTPL()->fetch('tagCloud').'
-				</div>
+				<div class="container-1">'.$content.'</div>
 			</div>');
 		}
 	}

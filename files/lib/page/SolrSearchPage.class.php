@@ -103,7 +103,10 @@ class SolrSearchPage extends SearchResultPage {
 			// press first dimension of stdobject into clean array
 			$data['message'] = isset($row->content[0]) ? $this->convertSingleWhitespace($row->content[0]) : '';
 			$data['subject'] = isset($row->title[0]) ? $row->title[0] : '';
-			$data['time'] = time(); // TODO: time
+			$data['username'] = isset($row->autor[0]) ? $row->autor[0] : '';
+			if(isset($row->tstamp[0]) && preg_match('/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/', $row->tstamp[0], $match)) {
+				$data['time'] = mktime($match[4], $match[5], $match[6], $match[2], $match[3], $match[1]);
+			}
 	
 			// increment message key position
 			$this->result[$i++] = $data;
