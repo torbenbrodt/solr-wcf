@@ -58,8 +58,8 @@ class SafeSearchableMessageType {
 
 		// join with taggable model?
 		$sql = "SELECT		taggableID
-			FROM 		wcf".WCF_N."_tag_taggable WHERE packageID = ".intval($packageID)."
-			WHERE		typeName = '".escapeString($this->type)."'";
+			FROM 		wcf".WCF_N."_tag_taggable
+			WHERE		packageID = ".intval($packageID);
 		$row = WCF::getDB()->getFirstRow($sql);
 		if($row) {
 			foreach(TagEngine::getInstance()->getTaggables() as $taggable) {
