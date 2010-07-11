@@ -3,6 +3,7 @@
 require_once(WCF_DIR.'lib/data/message/search/SearchEngine.class.php');
 require_once(WCF_DIR.'lib/data/solr/SafeSearchableMessageType.class.php');
 require_once(WCF_DIR.'lib/data/solr/SolrService.php');
+require_once(WCF_DIR.'lib/data/solr/SolrWCF.class.php');
 
 
 /**
@@ -25,7 +26,7 @@ class SolrBridge {
 	 * @var SolrService
 	 */
 	protected $solr = null;
-	
+
 	/**
 	 * segment has date format of YmdHis
 	 '
@@ -79,7 +80,7 @@ class SolrBridge {
 	}
 
 	/**
-	 *
+	 * attention, this function does not care for condition array, since these may depend a custom usersession
 	 */
 	protected function getTotals(array $types, $func) {
 
@@ -88,6 +89,9 @@ class SolrBridge {
 
 			// get search type object
 			$doc = $this->getSearchType($type);
+
+			SolrWCF::startAnonymousStandaloneSession($type);
+
 			if (!$doc->isAccessible()) continue;
 			if (!empty($sql)) $sql .= "\nUNION\n";
 
@@ -95,13 +99,22 @@ class SolrBridge {
 			$messageIDFieldName = $doc->getIDFieldName();
 			$messageIDFieldName = strpos($messageIDFieldName, '.') !== false ? $messageIDFieldName : "messageTable.".$messageIDFieldName;
 
+			$conditions = $doc->getConditions();
+			$conditions = empty($conditions) ? 1 : $conditions;
+
 			$sql .= "(
-				SELECT		".$func."(".$messageIDFieldName.") AS messageID,
+				SELECT		".$func."(messageID) AS messageID,
 						'".$type."' AS messageType
-				FROM 		".$doc->getTableName()." messageTable
-						".$doc->getJoins()."
+				FROM (
+					SELECT		$messageIDFieldName AS messageID
+					FROM 		".$doc->getTableName()." messageTable
+							".$doc->getJoins()."
+					WHERE		(".$conditions.")
+					GROUP BY	messageID
+				) x
 			)";
 		}
+		SolrWCF::endAnonymousStandaloneSession();
 
 		// send search query
 		$types = array();
@@ -130,9 +143,12 @@ class SolrBridge {
 	 *
 	 * @return	integer	number of added documents
 	 */
-	public function loadDocuments($type, $min, $max, $limit) {
+	protected function loadDocuments($type, $min, $max, $limit) {
 		// get search type object
 		$doc = $this->getSearchType($type);
+
+		SolrWCF::startAnonymousStandaloneSession($type);
+
 		if (!$doc->isAccessible()) continue;
 
 		// get field names
@@ -143,7 +159,7 @@ class SolrBridge {
 		$userIDFieldName = $doc->getUserIDFieldName();
 		$usernameFieldName = $doc->getUsernameFieldName();
 		$timeFieldName = $doc->getTimeFieldName();
-		
+
 		$select = $outerselect = array();
 		$outerselect[] = '*';
 		$select[] = "'".$type."' AS messageType";
@@ -155,33 +171,36 @@ class SolrBridge {
 				$select[] = "CAST(messageTable.".$column." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS subject".($subjects++);
 			}
 		}
-		
+
 		$messages = 0;
 		if($messageFieldNames) {
 			foreach($messageFieldNames as $column) {
 				$select[] = "CAST(messageTable.".$column." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS message".($messages++);
 			}
 		}
-		
+
 		if($userIDFieldName) {
 			$select[] = $userIDFieldName." AS userID";
 		}
-		
+
 		if($usernameFieldName) {
 			$select[] = "CAST(".$usernameFieldName." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS username";
 		}
-		
+
 		if($timeFieldName) {
 			$select[] = $timeFieldName." AS time";
 		}
-		
+
 		if($additional = $doc->getAdditionalInnerSelects()) {
 			$select[] = $additional;
 		}
-		
+
 		if($additional = $doc->getAdditionalOuterSelects()) {
 			$outerselect[] = $additional;
 		}
+
+		$conditions = $doc->getConditions();
+		$conditions = empty($conditions) ? 1 : $conditions;
 
 		$sql = "SELECT		".implode(",", $outerselect)."
 			FROM (
@@ -190,6 +209,7 @@ class SolrBridge {
 				FROM 		".$doc->getTableName()." messageTable
 						".$doc->getJoins()."
 				WHERE		".$messageIDFieldName." BETWEEN $min AND $max
+				AND		(".$conditions.")
 				GROUP BY	messageID
 				ORDER BY	messageID ASC
 				LIMIT		".intval($limit)."
@@ -199,7 +219,7 @@ class SolrBridge {
 			ORDER BY	messageID ASC";
 		$result = WCF::getDB()->sendQuery($sql);
 		$i = 0;
-		
+
 		while ($row = WCF::getDB()->fetchArray($result)) {
 			$row['subject'] = '';
 			for($j=0; $j<$subjects; $j++) {
@@ -207,17 +227,21 @@ class SolrBridge {
 				unset($row['subject'.$j]);
 			}
 			$row['subject'] = rtrim($row['subject']);
-			
+
 			$row['message'] = '';
 			for($j=0; $j<$messages; $j++) {
 				$row['message'] += $row['message'.$j].' ';
 				unset($row['message'.$j]);
 			}
 			$row['message'] = rtrim($row['message']);
-		
+
 			$this->addDocument($row);
 			$i++;
 		}
+
+
+
+		SolrWCF::endAnonymousStandaloneSession();
 		return $i;
 	}
 
@@ -227,7 +251,7 @@ class SolrBridge {
 	protected function addDocument($row) {
 
 		$doc = new Apache_Solr_Document();
-	
+
 		// very unique ID
 		$doc->id = $row['messageType'].':'.$row['messageID'];
 
@@ -276,8 +300,8 @@ class SolrBridge {
 	/**
 	 *
 	 */
-	public function doIndex($types = null, $limit = null) {
-	
+	public function doIndex($types = null, $limit = 50) {
+
 		// set current segments
 		$this->segment = date('YmdHis');
 
@@ -291,10 +315,13 @@ class SolrBridge {
 			if($status['total'] == $status['current']) {
 				continue;
 			}
+
+			SolrWCF::startAnonymousStandaloneSession($type);
+
 			// get search type object
 			$doc = $this->getSearchType($type);
 			if (!$doc->isAccessible()) continue;
-			
+
 			$j = $this->loadDocuments($type, $status['current'] + 1, $status['total'], $limit);
 			if($j) {
 				$i += $j;
@@ -303,6 +330,8 @@ class SolrBridge {
 				$this->commit();
 			}
 		}
+
+		SolrWCF::endAnonymousStandaloneSession();
 
 		return $i;
 	}
@@ -321,19 +350,19 @@ class SolrBridge {
 		}
 		return self::$typeids[$type];
 	}
-	
+
 	private function getSearchTypes() {
 		$types = SearchEngine::getSearchTypes();
 		$return = array();
 		foreach($types as $type) {
 			$doc = $this->getSearchType($type);
 			if (!$doc->isAccessible()) continue;
-			
+
 			$return[] = $type;
 		}
 		return $return;
 	}
-	
+
 	private function getSearchType($type) {
 		if (!isset(SearchEngine::$searchTypeObjects[$type])) {
 			throw new SystemException('unknown search type '.$type, 101001);

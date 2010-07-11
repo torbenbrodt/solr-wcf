@@ -45,11 +45,20 @@ class SafeSearchableMessageType {
 				$this->addColumnsFromTable($tableName);
 			}
 		}
+		
+		// get packageID
+		$packageID = 0;
+		$sql = "SELECT		packageID
+			FROM 		wcf".WCF_N."_searchable_message_type
+			WHERE		typeName = '".escapeString($this->type)."'";
+		$row = WCF::getDB()->getFirstRow($sql);
+		if($row) {
+			$packageID = $row['packageID'];
+		}
 
 		// join with taggable model?
 		$sql = "SELECT		taggableID
-			FROM 		wcf".WCF_N."_searchable_message_type
-			INNER JOIN 	wcf".WCF_N."_tag_taggable USING(packageID)
+			FROM 		wcf".WCF_N."_tag_taggable WHERE packageID = ".intval($packageID)."
 			WHERE		typeName = '".escapeString($this->type)."'";
 		$row = WCF::getDB()->getFirstRow($sql);
 		if($row) {

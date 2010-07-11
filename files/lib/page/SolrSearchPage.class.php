@@ -84,29 +84,26 @@ class SolrSearchPage extends SearchResultPage {
 		}
 		
 		// transform data in wcf compatible format
-		foreach($tmp->highlighting as $url => $row) {
-			// press first dimension of stdobject into clean array
+		foreach($tmp->highlighting as $id => $row) {
 			$data = array();
-			$data['messageID'] = $i;
-			$data['message'] = $this->convertSingleWhitespace($row->content[0]);
-			$data['subject'] = $row->title[0];
-			$data['url'] = $url;
-			$data['displayurl'] = $row->url[0];
-			$data['image'] = 'http://image.browsershots.de/'.parse_url($data['url'], PHP_URL_HOST);
+			
+			if(preg_match('/^([a-zA-Z]+):(\d+)$/', $id, $res)) {
+				list($messageType, $messageID) = array($res[1], $res[2]);
+			} else {
+				$messageType = 'solr';
+				$messageID = $i;
+				$data['url'] = $id;
+				$data['displayurl'] = $row->url[0];
+				$data['image'] = 'http://image.browsershots.de/'.parse_url($data['url'], PHP_URL_HOST);
+			}
+
+			$data['messageID'] = $messageID;
+			$data['type'] = $data['messageType'] = $messageType;
+			
+			// press first dimension of stdobject into clean array
+			$data['message'] = isset($row->content[0]) ? $this->convertSingleWhitespace($row->content[0]) : '';
+			$data['subject'] = isset($row->title[0]) ? $row->title[0] : '';
 			$data['time'] = time(); // TODO: time
-			$data['messageType'] = 'solr';
-			$data['type'] = 'solr';
-		
-			//  set solr defaults
-			if(!empty($row->messageType)) {
-				$data['messageType'] = $row->messageType;
-			}
-			if(!empty($row->type)) {
-				$data['type'] = $row->type;
-			}
-			if(!empty($row->messageID)) {
-				$data['messageID'] = $row->messageID;
-			}
 	
 			// increment message key position
 			$this->result[$i++] = $data;
