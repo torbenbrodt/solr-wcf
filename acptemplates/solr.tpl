@@ -39,61 +39,44 @@
 {if $results|isset && !$results|count}
 	<p class="error">{lang}wcf.acp.solr.noResults{/lang}</p>
 {/if}
-{*
-<form  method="post" action="index.php?form=Solr">
-	<div class="border content">
-		<div class="container-1">
-			<fieldset>
-				<legend>{lang}wcf.acp.solr.config{/lang}</legend>
-
-				<div class="formElement{if $errorField == 'username'} formError{/if}">
-					<div class="formFieldLabel">
-						<label for="username">{lang}wcf.user.username{/lang}</label>
-					</div>
-					<div class="formField">
-						<input type="text" class="inputText" id="username" name="username" value="" />
-						{if $errorField == 'username'}
-							<p class="innerError">
-								{if $errorType == 'notFound'}{lang}wcf.user.error.username.notFound{/lang}{/if}
-							</p>
-						{/if}
-					</div>
-				</div>
-
-				{if $additionalFields|isset}{@$additionalFields}{/if}
-			</fieldset>
-		</div>
-	</div>
-
-	<div class="formSubmit">
-		<input type="submit" accesskey="s" value="{lang}wcf.global.button.submit{/lang}" />
-		<input type="reset" accesskey="r" value="{lang}wcf.global.button.reset{/lang}" />
-		<input type="hidden" name="packageID" value="{@PACKAGE_ID}" />
- 		{@SID_INPUT_TAG}
- 	</div>
-</form>
-*}
 {if $results|isset && $results|count}
-	<div class="border content">
-		<div class="container-1">
-			<fieldset>
-				<legend>{lang}wcf.acp.solr.results{/lang}</legend>
+	<form method="post" action="index.php?form=Solr">
+		<div class="border content">
+			<div class="container-1">
+				<fieldset>
+					<legend>{lang}wcf.acp.solr.results{/lang}</legend>
 
-				{foreach from=$results item=result key=$type}
-					<div class="formElement">
-						<p class="formFieldLabel">{$type}</p>
-						<div class="formField">
-							<div class="statBar"><div style="width: {$result.percent|round}%;"></div></div>
-							<p class="statBarLabel">
-								{$result.percent|round}% {#$result.current}/{#$result.total}
-							</p>
+					{foreach from=$results item=result key=$type}
+						<div class="formElement">
+							<p class="formFieldLabel"><a href="#" onclick="$('options_{$type}').toggle();return false;">{$type}</a></p>
+							<div class="formField">
+								<div class="statBar"><div style="width: {$result.percent|round}%;"></div></div>
+								<p class="statBarLabel">
+									{$result.percent|round}% {#$result.current}/{#$result.total}
+								</p>
+								<div id="options_{$type}" style="display:none">
+									<div class="formElement">
+										<p class="formFieldLabel">{lang}boost{/lang}</p>
+										<div class="formField">
+											<input type="text" value="1.0" size="4" />
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
 
-				{/foreach}
-			</fieldset>
+					{/foreach}
+				</fieldset>
+			</div>
 		</div>
-	</div>
+
+		<div class="formSubmit">
+			<input type="submit" accesskey="s" value="{lang}wcf.global.button.submit{/lang}" />
+			<input type="reset" accesskey="r" value="{lang}wcf.global.button.reset{/lang}" />
+			<input type="hidden" name="packageID" value="{@PACKAGE_ID}" />
+	 		{@SID_INPUT_TAG}
+	 	</div>
+	</form
 {/if}
 
 {include file='footer'}

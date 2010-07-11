@@ -1,7 +1,7 @@
 <?php
 // wcf imports
 require_once(WCF_DIR.'lib/data/message/search/SearchEngine.class.php');
-require_once(WCF_DIR.'lib/data/solr/SafeSearchableMessageType.php');
+require_once(WCF_DIR.'lib/data/solr/SafeSearchableMessageType.class.php');
 require_once(WCF_DIR.'lib/data/solr/SolrService.php');
 
 
@@ -144,21 +144,22 @@ class SolrBridge {
 		$usernameFieldName = $doc->getUsernameFieldName();
 		$timeFieldName = $doc->getTimeFieldName();
 		
-		$select = array();
+		$select = $outerselect = array();
+		$outerselect[] = '*';
 		$select[] = "'".$type."' AS messageType";
 		$select[] = $messageIDFieldName." AS messageID";
 
 		$subjects = 0;
 		if($subjectFieldNames) {
 			foreach($subjectFieldNames as $column) {
-				$select[] = "CAST(messageTable.".$column." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS subject".(++$subjects);
+				$select[] = "CAST(messageTable.".$column." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS subject".($subjects++);
 			}
 		}
 		
 		$messages = 0;
 		if($messageFieldNames) {
 			foreach($messageFieldNames as $column) {
-				$select[] = "CAST(messageTable.".$column." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS message".(++$messages);
+				$select[] = "CAST(messageTable.".$column." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS message".($messages++);
 			}
 		}
 		
@@ -173,29 +174,44 @@ class SolrBridge {
 		if($timeFieldName) {
 			$select[] = $timeFieldName." AS time";
 		}
+		
+		if($additional = $doc->getAdditionalInnerSelects()) {
+			$select[] = $additional;
+		}
+		
+		if($additional = $doc->getAdditionalOuterSelects()) {
+			$outerselect[] = $additional;
+		}
 
-		$sql = "SELECT
-					".implode(",", $select)."
-			FROM 		".$doc->getTableName()." messageTable
-					".$doc->getJoins()."
-			WHERE		".$messageIDFieldName." BETWEEN $min AND $max
+		$sql = "SELECT		".implode(",", $outerselect)."
+			FROM (
+				SELECT
+						".implode(",", $select)."
+				FROM 		".$doc->getTableName()." messageTable
+						".$doc->getJoins()."
+				WHERE		".$messageIDFieldName." BETWEEN $min AND $max
+				GROUP BY	messageID
+				ORDER BY	messageID ASC
+				LIMIT		".intval($limit)."
+			) messageTable
+			".$doc->getOuterJoins()."
 			GROUP BY	messageID
 			ORDER BY	messageID ASC";
-
-		$result = WCF::getDB()->sendQuery($sql, $limit);
+		$result = WCF::getDB()->sendQuery($sql);
 		$i = 0;
+		
 		while ($row = WCF::getDB()->fetchArray($result)) {
 			$row['subject'] = '';
 			for($j=0; $j<$subjects; $j++) {
-				$row['subject'] += $row['subject'.$i].' ';
-				unset($row['subject'.$i]);
+				$row['subject'] += $row['subject'.$j].' ';
+				unset($row['subject'.$j]);
 			}
 			$row['subject'] = rtrim($row['subject']);
 			
 			$row['message'] = '';
 			for($j=0; $j<$messages; $j++) {
-				$row['message'] += $row['message'.$i].' ';
-				unset($row['message'.$i]);
+				$row['message'] += $row['message'.$j].' ';
+				unset($row['message'.$j]);
 			}
 			$row['message'] = rtrim($row['message']);
 		
@@ -203,56 +219,6 @@ class SolrBridge {
 			$i++;
 		}
 		return $i;
-	}
-	
-	/**
-	 * there are many ways to work with multiple sources. 
-	 * my decision was against the multicore approach. i decided on flattening the schema.xml
-	 *
-	 * @see http://wiki.apache.org/solr/MultipleIndexes
-	 * @deprecated
-	 */
-	protected function addDocumentSolr(&$doc, $row) {
-	
-		// very unique ID
-		$doc->id = $row['messageType'].$row['messageID'];
-		$doc->messageType = $row['messageType'];
-		$doc->messageID = $row['messageID'];
-		$doc->subject = $this->cleanText($row['subject']);
-		$doc->message = $this->cleanText($row['message']);
-		$doc->userID = $row['userID'];
-		$doc->username = $row['username'];
-		
-		// Convert date from timestamp into ISO 8601 format.
-		// @see http://lucene.apache.org/solr/api/org/apache/solr/schema/DateField.html
-		$doc->time = gmdate('Y-m-d\TH:i:s\Z', $row['time']);
-		
-		// get special tags from message
-		$text = $row['message'];
-		
-		// Extract HTML tag contents from $text and add to boost fields.
-		$tags_to_index = array(
-			'h1' => 'tags_h1',
-			'h2' => 'tags_h2_h3',
-			'h3' => 'tags_h2_h3',
-			'h4' => 'tags_h4_h5_h6',
-			'h5' => 'tags_h4_h5_h6',
-			'h6' => 'tags_h4_h5_h6',
-			'u' => 'tags_inline',
-			'b' => 'tags_inline',
-			'i' => 'tags_inline',
-			'strong' => 'tags_inline',
-			'em' => 'tags_inline',
-			'a' => 'tags_a',
-		);
-
-		// Strip off all ignored tags.
-		$text = strip_tags($text, '<'. implode('><', array_keys($tags_to_index)) .'>');
-
-		preg_match_all('@<('. implode('|', array_keys($tags_to_index)) .')[^>]*>(.*)</\1>@Ui', $text, $matches);
-		foreach ($matches[1] as $key => $tag) {
-			$document->{$tags_to_index[$tag]} .= ' '. $matches[2][$key];
-		}
 	}
 
 	/**
@@ -274,16 +240,16 @@ class SolrBridge {
 		$doc->host = parse_url(PAGE_URL, PHP_URL_HOST);
 		$doc->site = $doc->host;
 		$doc->url = PAGE_URL.'/index.php?page=SolrSearch&id='.$doc->id;
-		$doc->content = $this->cleanText($row['message']);
-		$doc->title = $this->cleanText($row['subject']);
+		if(isset($row['message'])) $doc->content = $this->cleanText($row['message']);
+		if(isset($row['subject'])) $doc->title = $this->cleanText($row['subject']);
 		$doc->cache = '';
-		$doc->tstamp = date('YmdHis', $row['time']);
+		if(isset($row['time'])) $doc->tstamp = date('YmdHis', $row['time']);
 
 		// fields for index-anchor plugin
-		#$doc->anchor = '';
+		if(isset($row['anchor'])) $doc->anchor = $row['anchor'];
 
 		// fields for index-more plugin
-		#$doc->type = '';
+		$doc->type = $row['messageType'];
 		#$doc->contentLength = '';
 		#$doc->lastModified = '';
 		#$doc->date = '';
@@ -295,7 +261,7 @@ class SolrBridge {
 		#$doc->subcollection = '';
 
 		// fields for feed plugin
-		$doc->author = $row['username'];
+		if(isset($row['username'])) $doc->author = $row['username'];
 		#$doc->tag = '';
 		#$doc->feed = '';
 		#$doc->publishedDate = '';
@@ -372,7 +338,7 @@ class SolrBridge {
 		if (!isset(SearchEngine::$searchTypeObjects[$type])) {
 			throw new SystemException('unknown search type '.$type, 101001);
 		}
-		return new SafeSearchableMessageType(SearchEngine::$searchTypeObjects[$type]);
+		return new SafeSearchableMessageType($type, SearchEngine::$searchTypeObjects[$type]);
 	}
 
 	/**
