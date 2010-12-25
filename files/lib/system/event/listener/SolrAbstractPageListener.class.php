@@ -31,7 +31,6 @@ class SolrAbstractPageListener implements EventListener {
 	 * @see UserPage::assignVariables()
 	 */
 	protected function assignVariables() {
-		return;
 		/*
 		 * $searchScript=search script; default=index.php?form=search
 		 * $searchFieldName=name of the search input field; default=q
