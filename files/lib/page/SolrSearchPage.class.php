@@ -94,7 +94,7 @@ class SolrSearchPage extends SearchResultPage {
 				$messageID = $i;
 				$data['url'] = $id;
 				$data['displayurl'] = $row->url[0];
-				$data['image'] = 'http://image.browsershots.de/'.parse_url($data['url'], PHP_URL_HOST);
+				$data['image'] = 'http://images.websnapr.com/?size=s&url='.parse_url($data['url'], PHP_URL_HOST);
 			}
 
 			$data['messageID'] = $messageID;
@@ -140,5 +140,16 @@ class SolrSearchPage extends SearchResultPage {
 		
 		return $this->total;
 	}
+
+	/**
+	 * @see Page::assignVariables()
+	 */
+	public function assignVariables() {
+		parent::assignVariables();
+
+		WCF::getTPL()->assign(array(
+			'allowSpidersToIndexThisPage' => true
+		));
+	 }
 }
 ?>
