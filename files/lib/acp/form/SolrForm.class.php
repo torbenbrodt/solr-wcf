@@ -18,6 +18,17 @@ class SolrForm extends ACPForm {
 	 * @var	string
 	 */
 	public $templateName = 'solr';
+
+	/**
+	 *
+	 * @var	string
+	 */
+	public $errorFieldMessage = '';
+	
+	/**
+	 *
+	 */
+	protected $status = array();
 	
 	/**
 	 * Active menu item
@@ -45,8 +56,13 @@ class SolrForm extends ACPForm {
 	public function readData() {
 		parent::readData();
 
-		$this->bridge = new SolrBridge();
-		$this->status = $this->bridge->getIndexStatus();
+		try {
+			$this->bridge = new SolrBridge();
+			$this->status = $this->bridge->getIndexStatus();
+		} catch(Exception $e) {
+			$this->errorField = $e->getMessage();
+			$this->errorFieldMessage = ': '.$this->errorField;
+		}
 	}
 
 	/**
@@ -58,6 +74,12 @@ class SolrForm extends ACPForm {
 		WCF::getTPL()->assign(array(
 			'results' => $this->status,
 		));
+		
+		if($this->errorFieldMessage != '') {
+			WCF::getTPL()->assign(array(
+				'errorFieldMessage' => $this->errorFieldMessage,
+			));
+		}
 	}
 }
 ?>

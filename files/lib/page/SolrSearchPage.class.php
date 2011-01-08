@@ -52,14 +52,16 @@ class SolrSearchPage extends SearchResultPage {
 	
 		// seo friendly redirect of page 1
 		if(isset($_GET['pageNo']) && $_GET['pageNo'] == 1) {
-			$url = ($this->isHTTPS() ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].str_replace("&pageNo=1", "", $_SERVER['REQUEST_URI']);
-			HeaderUtil::redirect($url, false, true);
+			$args = $_GET;
+			unset($args['pageNo']);
+			$url = 'index.php?'.http_build_query($args);
+			HeaderUtil::redirect($url);
 			exit;
 		}
 		
 		if (isset($_POST['q'])) {
-			$url = ($this->isHTTPS() ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].'/index.php?page=SolrSearch&q='.$_POST['q'];
-			HeaderUtil::redirect($url, false, true);
+			$url = 'index.php?page=SolrSearch&q='.$_POST['q'];
+			HeaderUtil::redirect($url);
 			exit;
 		}
 		

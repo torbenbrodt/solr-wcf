@@ -41,11 +41,8 @@ class SolrAbstractPageListener implements EventListener {
 		 * $searchHiddenFields=optional hidden fields; default=empty
 		 * $searchShowExtendedLink=set to false to disable extended search link; default=true
 		 */
-		 $searchScript = (CUSTOMSEARCH_POSTGET == "post") ? CUSTOMSEARCH_SEARCHSCRIPT : 'index.php?page=CustomSearchRedirect';
-		 $searchFieldName = 'q';
-		 
 		 WCF::getTPL()->assign(array(
-		 	'searchScript' => 'index.php?form=SolrSearch'.SID_ARG_2ND,
+		 	'searchScript' => 'index.php?page=SolrSearch'.SID_ARG_2ND,
 		 	'searchFieldName' => 'q'
 		 ));
 	}

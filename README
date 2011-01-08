@@ -3,3 +3,10 @@
  * spaltennamen aus SearchableMessageType verwenden
  * aktuellen stand der indexierung merken und nur neue items pushen
  * TODO: exclude types! pms dürfen nicht in die public suche
+ 
+ * use facet search
+  * http://www.lucidimagination.com/Community/Hear-from-the-Experts/Articles/Faceted-Search-Solr
+  * &facet=true&facet.field=site&facet.field=type&facet.field=author
+
+ * clustering
+  * http://www.lucidimagination.com/blog/2009/09/28/solrs-new-clustering-capabilities/

@@ -33,7 +33,7 @@
 </div>
 
 {if $errorField}
-	<p class="error">{lang}wcf.global.form.error{/lang}</p>
+	<p class="error">{lang}wcf.global.form.error{/lang}{if $errorFieldMessage|isset}{@$errorFieldMessage}{/if}</p>
 {/if}
 
 {if $results|isset && !$results|count}
