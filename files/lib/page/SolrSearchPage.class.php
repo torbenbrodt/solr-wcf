@@ -34,7 +34,7 @@ class SolrSearchPage extends SearchResultPage {
 	public function readParameters() {
 		parent::readParameters();
 
-		if (isset($_REQUEST['fq'])) $this->fq = $_REQUEST['fq'];
+		if (isset($_REQUEST['fq'])) $this->fq = is_array($_REQUEST['fq']) ? $_REQUEST['fq'] : array($_REQUEST['fq']);
 	}
 
 	/**
@@ -109,8 +109,13 @@ class SolrSearchPage extends SearchResultPage {
 
 		$facets = isset($tmp->facet_counts->facet_fields) ? get_object_vars($tmp->facet_counts->facet_fields) : array();
                 foreach($facets as $key => &$val) {
-                        $val = get_object_vars($val);
-                        $val = array_filter($val, create_function('$a', 'return $a > 0;'));
+			$val = get_object_vars($val);
+			$val = array_filter($val, create_function('$a', 'return $a > 0;'));
+			if(count($val) == 1) {
+				$val = array();
+			} else {
+				$val = array_slice($val, 0, 20, true);
+			}
                 }
                 $this->facets = array_filter($facets);
 
@@ -177,9 +182,15 @@ class SolrSearchPage extends SearchResultPage {
 	 */
 	public function assignVariables() {
 		parent::assignVariables();
+		
+		$additionalPagesParameters = array();
+		if($this->fq) {
+			$additionalPagesParameters['fq'] = $this->fq;
+		}
 
 		WCF::getTPL()->assign(array(
 			'facets' => $this->facets,
+			'additionalPagesParameterString' => $additionalPagesParameters ? '&'.http_build_query($additionalPagesParameters) : '',
 			'singleColumn' => empty($this->facets),
 			'allowSpidersToIndexThisPage' => true
 		));

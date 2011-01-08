@@ -44,7 +44,7 @@
 	
 	<div class="contentHeader">
 		{assign var=encodedQuery value=$query|urlencode}
-		{pages print=false assign=pagesOutput link="index.php?page=SolrSearch&q=$encodedQuery&pageNo=%d"|concat:SID_ARG_2ND_NOT_ENCODED}
+		{pages print=false assign=pagesOutput link="index.php?page=SolrSearch&q=$encodedQuery$additionalPagesParameterString&pageNo=%d"|concat:SID_ARG_2ND_NOT_ENCODED}
 		
 		{if $alterable}
 			<div class="largeButtons">
@@ -118,7 +118,7 @@
 													<img src="{@RELATIVE_WCF_DIR}icon/searchM.png" alt="" />
 												</div>
 												<div class="containerContent">
-													<h4><a href="index.php?page=SolrSearch&amp;q={$query|rawurlencode}&fq[]={$headline}:{$name}{@SID_ARG_2ND}">{$name}</a></h4>
+													<h4><a href="index.php?page=SolrSearch&amp;q={$query|rawurlencode}&fq={$headline}:{$name}{@SID_ARG_2ND}">{$name}</a></h4>
 													<p class="light smallFont">{$count} Treffer</p>
 												</div>
 											</li>
