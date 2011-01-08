@@ -11,6 +11,14 @@ require_once(WCF_DIR.'lib/data/solr/SolrService.php');
  */
 class SolrSearchPage extends SearchResultPage {
 	public $templateName = 'solr';
+	public $fq = array();
+	public $facets = array();
+	public $facet_field = array(
+		'site',
+		'type',
+		'author',
+	);
+
 	protected $total = 0;
 	
 	/**
@@ -18,6 +26,15 @@ class SolrSearchPage extends SearchResultPage {
 	 */
 	public function __construct() {
 		parent::__construct(0);
+	}
+
+	/**
+	 * @see Page::readParameters()
+	 */
+	public function readParameters() {
+		parent::readParameters();
+
+		if (isset($_REQUEST['fq'])) $this->fq = $_REQUEST['fq'];
 	}
 
 	/**
@@ -78,13 +95,25 @@ class SolrSearchPage extends SearchResultPage {
 
 		// query search
 		$solr = new SolrService();
-		$tmp = $solr->search($this->query, $offset, $this->itemsPerPage);
-		$this->total = intval($tmp->response->numFound);
+		$tmp = $solr->search($this->query, $offset, $this->itemsPerPage, array(
+			'fq' => $this->fq,
+			'facet' => 'true',
+			'facet.field' => $this->facet_field
+		));
 		
 		if(!$tmp || !$tmp->highlighting) {
 			return;
 		}
-		
+
+		$this->total = intval($tmp->response->numFound);
+
+		$facets = isset($tmp->facet_counts->facet_fields) ? get_object_vars($tmp->facet_counts->facet_fields) : array();
+                foreach($facets as $key => &$val) {
+                        $val = get_object_vars($val);
+                        $val = array_filter($val, create_function('$a', 'return $a > 0;'));
+                }
+                $this->facets = array_filter($facets);
+
 		// transform data in wcf compatible format
 		foreach($tmp->highlighting as $id => $row) {
 			$data = array();
@@ -150,6 +179,8 @@ class SolrSearchPage extends SearchResultPage {
 		parent::assignVariables();
 
 		WCF::getTPL()->assign(array(
+			'facets' => $this->facets,
+			'singleColumn' => empty($this->facets),
 			'allowSpidersToIndexThisPage' => true
 		));
 	 }
