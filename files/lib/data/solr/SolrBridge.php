@@ -221,16 +221,17 @@ class SolrBridge {
 		$i = 0;
 
 		while ($row = WCF::getDB()->fetchArray($result)) {
+		
 			$row['subject'] = '';
 			for($j=0; $j<$subjects; $j++) {
-				$row['subject'] += $row['subject'.$j].' ';
+				$row['subject'] .= $row['subject'.$j].' ';
 				unset($row['subject'.$j]);
 			}
 			$row['subject'] = rtrim($row['subject']);
 
 			$row['message'] = '';
 			for($j=0; $j<$messages; $j++) {
-				$row['message'] += $row['message'.$j].' ';
+				$row['message'] .= $row['message'.$j].' ';
 				unset($row['message'.$j]);
 			}
 			$row['message'] = rtrim($row['message']);
