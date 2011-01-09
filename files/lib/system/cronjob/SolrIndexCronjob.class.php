@@ -17,6 +17,9 @@ class SolrIndexCronjob implements Cronjob {
 	public function execute($data) {
 		$bridge = new SolrBridge();
 		$bridge->doIndex(null, 100);
+		
+		// reindex enabled?
+		$bridge->doReindex(null, 100);
 	}
 }
 ?>

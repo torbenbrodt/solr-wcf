@@ -149,7 +149,7 @@ class SolrBridge {
 
 		SolrWCF::startAnonymousStandaloneSession($type);
 
-		if (!$doc->isAccessible()) continue;
+		if (!$doc->isAccessible()) return 0;
 
 		// get field names
 		$messageIDFieldName = $doc->getIDFieldName();
@@ -221,7 +221,7 @@ class SolrBridge {
 		$i = 0;
 
 		while ($row = WCF::getDB()->fetchArray($result)) {
-		
+
 			$row['subject'] = '';
 			for($j=0; $j<$subjects; $j++) {
 				$row['subject'] .= $row['subject'.$j].' ';
@@ -239,8 +239,6 @@ class SolrBridge {
 			$this->addDocument($row);
 			$i++;
 		}
-
-
 
 		SolrWCF::endAnonymousStandaloneSession();
 		return $i;
@@ -317,12 +315,6 @@ class SolrBridge {
 				continue;
 			}
 
-			SolrWCF::startAnonymousStandaloneSession($type);
-
-			// get search type object
-			$doc = $this->getSearchType($type);
-			if (!$doc->isAccessible()) continue;
-
 			$j = $this->loadDocuments($type, $status['current'] + 1, $status['total'], $limit);
 			if($j) {
 				$i += $j;
@@ -332,7 +324,63 @@ class SolrBridge {
 			}
 		}
 
-		SolrWCF::endAnonymousStandaloneSession();
+		return $i;
+	}
+
+	/**
+	 *
+	 */
+	public function doReindex($types = null, $limit = 50) {
+
+		// set current segments
+		$this->segment = date('YmdHis');
+
+		// get types
+		$types = is_array($types) ? $types : $this->getSearchTypes();
+		$reverse = array();
+		foreach($types as $type) {
+			$reverse[self::getTypeID($type)] = $type;
+		}
+		$i = 0;
+
+		$sql = 'SELECT		*
+			FROM 		wcf'.WCF_N.'_solr_reindex
+			WHERE		status = 1
+			AND		typeID IN ('.implode(',', array_keys($reverse)).')
+			LIMIT		'.$limit;
+		$result = WCF::getDB()->sendQuery($sql);
+		while ($row = WCF::getDB()->fetchArray($result)) {
+
+			$messageType = $reverse[$row['typeID']];
+			$j = $this->loadDocuments($messageType, $row['messageID'], $row['messageID'], 1);
+
+			// mark items as done
+			$sql = "UPDATE		wcf".WCF_N."_solr_reindex
+				SET		status = 0
+				WHERE		typeID = ".$row['typeID']."
+				AND		messageID = ".$row['messageID'];
+			WCF::getDB()->sendQuery($sql);
+
+			// delete
+			if(!$j) {
+				$j = 1;
+
+				// delete from solr
+				$this->solr->deleteById($messageType.':'.$row['messageID']);
+
+				// delete from main index
+				$sql = "DELETE FROM	wcf".WCF_N."_solr_index
+					WHERE		typeID = ".$row['typeID']."
+					AND		messageID = ".$row['messageID'];
+				WCF::getDB()->sendQuery($sql);
+			}
+			$i += $j;
+		}
+
+		if($i > 0) {
+			$this->solr->commit();
+			$this->solr->optimize();
+		}
 
 		return $i;
 	}

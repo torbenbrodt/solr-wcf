@@ -63,6 +63,24 @@ class SolrForm extends ACPForm {
 			$this->errorField = $e->getMessage();
 			$this->errorFieldMessage = ': '.$this->errorField;
 		}
+		
+		
+		$this->reindex = array();
+		$sql = 'SELECT	typeName,
+				x.*
+			FROM ( 
+				SELECT		typeID,
+						SUM(IF(status=0,1,0)) AS current,
+						COUNT(status) AS total,
+						100 / COUNT(status) * SUM(IF(status=0,1,0)) AS percent
+				FROM 		wcf'.WCF_N.'_solr_reindex
+				GROUP BY	typeID
+			) x
+			INNER JOIN	wcf'.WCF_N.'_searchable_message_type USING(typeID)';
+		$result = WCF::getDB()->sendQuery($sql);
+		while ($row = WCF::getDB()->fetchArray($result)) {
+			$this->reindex[$row['typeName']] = $row;
+		}
 	}
 
 	/**
@@ -73,6 +91,7 @@ class SolrForm extends ACPForm {
 
 		WCF::getTPL()->assign(array(
 			'results' => $this->status,
+			'reindex' => $this->reindex,
 		));
 		
 		if($this->errorFieldMessage != '') {

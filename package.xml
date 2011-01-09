@@ -5,7 +5,7 @@
 		<packagename>Solr Search</packagename>
 		<packagedescription>Solr powered search client. Solr backend needed!</packagedescription>
 		<packagedescription language="de">Das Paket integriert ein Solr Search Interface. Es wird ein zusätzlicher Solr Server benötigt.</packagedescription>
-		<version>1.0.0 RC 2</version>
+		<version>1.0.0 RC 3</version>
 		<plugin>com.woltlab.wcf</plugin>
 		<isunique>1</isunique>
 		<date>DATE</date>
@@ -44,15 +44,14 @@
 		<languages languagecode="en">en.xml</languages>
 	</instructions>
 	
-	<instructions type="update" fromversion="1.0.0 RC 1">	
+	<instructions type="update" fromversion="1.0.0 RC 2">
 		<files>files.tar</files>
 		<templates>templates.tar</templates>
-		<cronjobs>cronjobs.xml</cronjobs>
-		<options>options.xml</options>
+		<acptemplates>acptemplates.tar</acptemplates>
+		<sql>update.sql</sql>
 		
 		<!-- languages -->
 		<languages languagecode="de">de.xml</languages>
 		<languages languagecode="en">en.xml</languages>
-		<pagemenu>pagemenu.xml</pagemenu>
 	</instructions>
 </package>

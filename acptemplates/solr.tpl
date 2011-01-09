@@ -67,6 +67,22 @@
 
 					{/foreach}
 				</fieldset>
+				<fieldset>
+					<legend>{lang}wcf.acp.solr.reindex{/lang}</legend>
+
+					{foreach from=$reindex item=result key=$type}
+						<div class="formElement">
+							<p class="formFieldLabel">{$type}</p>
+							<div class="formField">
+								<div class="statBar"><div style="width: {$result.percent|round}%;"></div></div>
+								<p class="statBarLabel">
+									{$result.percent|round}% {#$result.current}/{#$result.total}
+								</p>
+							</div>
+						</div>
+
+					{/foreach}
+				</fieldset>
 			</div>
 		</div>
 

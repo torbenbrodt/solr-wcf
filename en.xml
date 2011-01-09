@@ -3,9 +3,9 @@
 <language languagecode="de">
 	<category name="wcf.acp.option">
 		<item name="wcf.acp.option.solr_url"><![CDATA[Solr]]></item>
-		<item name="wcf.acp.option.solr_url.description"><![CDATA[e.g. http://www.your-server.com:80/solr/]]></item>
+		<item name="wcf.acp.option.solr_url.description"><![CDATA[e.g. http://www.your-server.com:8983/solr/]]></item>
 		<item name="wcf.acp.option.solr_servlet_search"><![CDATA[Solr Search Servlet]]></item>
-		<item name="wcf.acp.option.solr_servlet_search.description"><![CDATA[e.g. nutch]]></item>
+		<item name="wcf.acp.option.solr_servlet_search.description"><![CDATA[e.g. select or nutch.]]></item>
 		<item name="wcf.acp.option.module_solr"><![CDATA[Solr]]></item>
 		<item name="wcf.acp.option.module_solr.description"><![CDATA[Solr Searchserver.]]></item>
 	</category>
@@ -21,5 +21,9 @@
 
 	<category name="wcf.acp.solr">
 		<item name="wcf.acp.solr"><![CDATA[Solr]]></item>
+	</category>
+	<category name="wcf.acp.option">
+		<item name="wcf.acp.option.category.general.search"><![CDATA[Search]]></item>
+		<item name="wcf.acp.option.category.general.search.description"><![CDATA[]]></item>
 	</category>
 </language>
