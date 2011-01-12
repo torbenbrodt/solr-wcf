@@ -56,21 +56,25 @@ class SolrBridge {
 	 * pushs all documents to solr
 	 */
 	protected function commit() {
-		$this->solr->addDocuments( $this->documents );
-		$this->solr->commit();
+		if($this->documents) {
+			$this->solr->addDocuments( $this->documents );
 
-		// mark items as done
-		$sql = "INSERT IGNORE INTO
-				wcf".WCF_N."_solr_index
-				(typeID, messageID)
-			VALUES ";
-		foreach($this->documents as $doc) {
-			list($messageType, $messageID) = explode(":", $doc->id);
-			$typeID = $this->getTypeID($messageType);
-			$sql .= "($typeID,".$messageID."),";
+			// mark items as done
+			$sql = "INSERT IGNORE INTO
+					wcf".WCF_N."_solr_index
+					(typeID, messageID)
+				VALUES ";
+			foreach($this->documents as $doc) {
+				list($messageType, $messageID) = explode(":", $doc->id);
+				$typeID = $this->getTypeID($messageType);
+				$sql .= "($typeID,".$messageID."),";
+			}
+			$sql = rtrim($sql, ',');
+			$result = WCF::getDB()->sendQuery($sql);
 		}
-		$sql = rtrim($sql, ',');
-		$result = WCF::getDB()->sendQuery($sql);
+		
+		// commit
+		$this->solr->commit();
 
 		// reset array
 		$this->documents = array();
@@ -182,8 +186,18 @@ class SolrBridge {
 		if($userIDFieldName) {
 			$select[] = $userIDFieldName." AS userID";
 		}
-
-		if($usernameFieldName) {
+		
+		// username field is not allowed to be empty and does not end with string userID
+		$hasUsername = !empty($usernameFieldName) && !(
+			($x = mb_strrpos($usernameFieldName, 'userID')) !== false && 
+			$x == mb_strlen($usernameFieldName) - mb_strlen('userID')
+		);
+		
+		$additionalJoins = '';
+		if($userIDFieldName && !$hasUsername) {
+			$select[] = "CAST(solr_user.username AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS username";
+			$additionalJoins .= ' LEFT JOIN wcf'.WCF_N.'_user solr_user USING(userID) ';
+		} else if($usernameFieldName) {
 			$select[] = "CAST(".$usernameFieldName." AS CHAR CHARACTER SET ".WCF::getDB()->getCharset().") AS username";
 		}
 
@@ -208,6 +222,7 @@ class SolrBridge {
 						".implode(",", $select)."
 				FROM 		".$doc->getTableName()." messageTable
 						".$doc->getJoins()."
+						".$additionalJoins."
 				WHERE		".$messageIDFieldName." BETWEEN $min AND $max
 				AND		(".$conditions.")
 				GROUP BY	messageID
@@ -378,8 +393,7 @@ class SolrBridge {
 		}
 
 		if($i > 0) {
-			$this->solr->commit();
-			$this->solr->optimize();
+			$this->commit();
 		}
 
 		return $i;
