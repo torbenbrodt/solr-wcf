@@ -109,7 +109,7 @@
 								<div class="border"> 
 									<div class="containerHead"> 
 										<h3>{lang}{$headline}{/lang}</h3> 
-									</div> 
+									</div>
 									 
 									<ul class="dataList">
 										{foreach from=$items item=count key=name}

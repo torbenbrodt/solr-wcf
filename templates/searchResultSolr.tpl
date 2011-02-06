@@ -14,7 +14,7 @@
 		</div>
 		
 		<div class="messageFooter">
-			<a href="{$item.message->url}" class="externalURL">{@$item.message->displayurl}</a>
+			<a href="{$item.message->url}{@SID_ARG_2ND}" class="externalURL">{@$item.message->displayurl}</a>
 		</div>
 		<hr />
 	</div>

@@ -50,17 +50,6 @@ class SolrSearchPage extends SearchResultPage {
 		}
 		return $string;
 	}
-
-	/**
-	 * if the client is (or claims to be) connected via HTTPS
-	 * @return boolean
-	 */
-	protected function isHTTPS() {
-		return isset($_SERVER["HTTP_X_PROTO"]) ||
-			(isset($_SERVER['HTTPS']) &&
-				!empty($_SERVER['HTTPS']) &&
-				$_SERVER['HTTPS'] !== 'off');
-	}
 	
 	/**
 	 * Gets the data of the selected search from database.
@@ -116,6 +105,15 @@ class SolrSearchPage extends SearchResultPage {
 			} else {
 				$val = array_slice($val, 0, 20, true);
 			}
+			/*
+			if($key == 'type') {
+				$tmp = $val;
+				$val = array();
+				foreach($tmp as $key => $value) {
+					$key = WCF::getLanguage()->get("wcf.search.type.".$key);
+					$val[$key] = $value;
+				}
+			}*/
                 }
                 $this->facets = array_filter($facets);
 
@@ -181,7 +179,13 @@ class SolrSearchPage extends SearchResultPage {
 	 * @see Page::assignVariables()
 	 */
 	public function assignVariables() {
+
 		parent::assignVariables();
+		
+		if($this->templateName == 'solrAtom') {
+			require_once(WCF_DIR.'lib/util/SolrTemplateWrapperUtil.class.php');
+			$this->messages = SolrTemplateWrapperUtil::parse($this->messages);
+		}
 		
 		$additionalPagesParameters = array();
 		if($this->fq) {
@@ -189,11 +193,31 @@ class SolrSearchPage extends SearchResultPage {
 		}
 
 		WCF::getTPL()->assign(array(
+			'messages' => $this->messages,
 			'facets' => $this->facets,
 			'additionalPagesParameterString' => $additionalPagesParameters ? '&'.http_build_query($additionalPagesParameters) : '',
 			'singleColumn' => empty($this->facets),
 			'allowSpidersToIndexThisPage' => true
 		));
 	 }
+	
+	/**
+	 * @see Page::show()
+	 */
+	public function show() {
+		
+		// overwrite template with atom format
+		if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'atom') {
+			$this->templateName = 'solrAtom';
+		}
+		if (isset($_REQUEST['num'])) $this->itemsPerPage = intval($_REQUEST['num']);
+		
+		parent::show();
+		
+		// overwrite template with atom format
+		if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'atom') {
+			header('Content-type: text/xml');
+		}
+	}
 }
 ?>
