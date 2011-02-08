@@ -18,6 +18,11 @@ class SolrTemplateWrapperUtil {
 	 */
 	public static function parse($messages) {
 		
+		if(count($messages)) {
+			// dummy, assign cycles
+			WCF::getTPL()->fetch('searchResult');
+		}
+		
 		foreach($messages as $item) {
 			if(isset($item['url'])) {
 				continue;
