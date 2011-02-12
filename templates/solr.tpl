@@ -91,7 +91,7 @@
 			<div class="columnContainer">
 				<div class="container-1{if $singleColumn == false} column first{/if}">
 					<div class="columnInner">
-						<div class="contentBox">
+						<div class="contentBox" id="searchResults">
 	
 						{foreach from=$messages item=item}
 							{include file=$types[$item.type]->getResultTemplateName()}
@@ -133,6 +133,20 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript">
+	onloadEvents.push(function() {
+		if(_gaq) {
+			var links = $$('#searchResults a');
+			for(var i=0; i<links.length; i++) {
+				links[i].onclick = function(href) {
+					return function () {
+						_gaq.push(['_trackEvent', 'search', 'solr', href]);
+					};
+				}(links[i].href);
+			}
+		}
+	});
+	</script>
 	
 	<div class="contentFooter">
 		{@$pagesOutput}
