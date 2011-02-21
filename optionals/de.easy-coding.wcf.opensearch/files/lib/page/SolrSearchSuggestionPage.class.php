@@ -6,7 +6,7 @@ require_once(WCF_DIR.'lib/page/AbstractFeedPage.class.php');
  * use search suggestions
  *
  * @license	GNU General Public License <http://opensource.org/licenses/gpl-3.0.html>
- * @package	de.easy-coding.wcf.solr.opensearch
+ * @package	de.easy-coding.wcf.opensearch
  */
 class SolrSearchSuggestionPage extends AbstractFeedPage {
 	
