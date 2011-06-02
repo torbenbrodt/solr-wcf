@@ -5,7 +5,7 @@
 		<packagename>Solr Search</packagename>
 		<packagedescription>Solr powered search client. Solr backend needed!</packagedescription>
 		<packagedescription language="de">Das Paket integriert ein Solr Search Interface. Es wird ein zusätzlicher Solr Server benötigt.</packagedescription>
-		<version>1.0.0 RC 4</version>
+		<version>1.0.0</version>
 		<plugin>com.woltlab.wcf</plugin>
 		<isunique>1</isunique>
 		<date>DATE</date>
