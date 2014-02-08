@@ -128,7 +128,7 @@ class SolrSearchPage extends SearchResultPage {
 				$messageID = $i;
 				$data['url'] = $id;
 				$data['displayurl'] = $row->url[0];
-				$data['image'] = 'http://images.websnapr.com/?size=s&url='.parse_url($data['url'], PHP_URL_HOST);
+				$data['image'] = 'http://www.m-software.de/screenshot/Screenshot.png?url='.urlencode($data['url']);
 			}
 
 			$data['messageID'] = $messageID;

@@ -142,7 +142,7 @@ class Apache_Solr_Response
 
 					$type = trim($parts[0]);
 
-					if ($parts[1])
+					if (isset($parts[1]))
 					{
 						//split the encoding section again to get the value
 						$parts = explode('=', $parts[1], 2);
